@@ -13,54 +13,86 @@ db = my.connect(
 cursor = db.cursor()
 
 print("\n====================== HAND CRICKET GAME ===========================")
-print("1. Login")
-print("2. Signup")
+print("____________")
+print("|1. Login  |")
+print("|2. Signup |")
+print("____________")
+while True:
+    choice = input("Enter your choice: ").lower()
+    if choice == "signup" or choice == "2":
+        user = input("Choose a username: ")
+        password = input("Choose a password: ")
 
-choice = input("Enter your choice: ").lower()
-if choice == "signup" or choice == "2":
-    user = input("Choose a username: ")
-    password = input("Choose a password: ")
+        cursor.execute("SELECT * FROM users WHERE username=%s", (user,))
+        result = cursor.fetchone()
 
-    cursor.execute("SELECT * FROM users WHERE username=%s", (user,))
-    result = cursor.fetchone()
+        if result:
+            print("Username already exists.")
+            exit()
 
-    if result:
-        print("Username already exists.")
-        exit()
+        cursor.execute(
+            "INSERT INTO users(username,password) VALUES(%s,%s)",
+            (user, password)
+        )
+        db.commit()
 
-    cursor.execute(
-        "INSERT INTO users(username,password) VALUES(%s,%s)",
-        (user, password)
-    )
-    db.commit()
+        print("Account created successfully!")
+        break
 
-    print("Account created successfully!")
+    elif choice == "login" or choice == "1":
+        user = input("Username: ")
+        password = input("Password: ")
 
-elif choice == "login" or choice == "1":
-    user = input("Username: ")
-    password = input("Password: ")
+        cursor.execute(
+            "SELECT * FROM users WHERE username=%s AND password=%s",
+            (user, password)
+        )
 
-    cursor.execute(
-        "SELECT * FROM users WHERE username=%s AND password=%s",
-        (user, password)
-    )
+        result = cursor.fetchone()
 
-    result = cursor.fetchone()
-
-    if result:
-        print("Login Successful!")
+        if result:
+            print("Login Successful!")
+            break
+        else:
+            print("Invalid Username or Password")
+            exit()
     else:
-        print("Invalid Username or Password")
+        print("Invalid choice.")
+        cursor.close()
+        db.close()
         exit()
-else:
-    print("Invalid choice.")
-    cursor.close()
-    db.close()
-    exit()
 
 print(f"Welcome {user} to the Hand Cricket Game!")
 
+a2=input("Do you want to see your stats? (yes/no): ").lower()
+while a2 not in ["yes", "no"]:
+    print("Please enter 'yes' or 'no'.")
+    a2=input("Do you want to see your stats? (yes/no): ").lower()
+while True:
+    if a2=="yes":
+        cursor.execute("""
+        SELECT matches, wins, losses, highest_score, total_runs
+        FROM users
+        WHERE username=%s
+        """, (user,))
 
+        stats = cursor.fetchone()
+
+        print("\n========== PLAYER STATS ==========")
+        print("Matches Played :", stats[0])
+        print("Wins           :", stats[1])
+        print("Losses         :", stats[2])
+        print("Highest Score  :", stats[3])
+        print("Total Runs     :", stats[4])
+        print("==================================")
+        time.sleep(7)
+        break
+
+    elif a2=="no":
+        print("Let's start the game!")
+        break
+    else:
+        print("Please enter 'yes' or 'no'.")
 
 
 def get_random_number():
@@ -84,6 +116,7 @@ print("6. If you enter a number outside 0-10 while bowling, 5 bonus runs will be
 print("7. Scores cannot go below 0 after a penalty.")
 print("8. The team with the higher score wins.")
 print("========================================\n")
+time.sleep(5)
 
 print("=" * 60)
 print("TOSS TIME")
@@ -99,14 +132,17 @@ while True:
         x1 = int(input("enter a number (0-10): "))
         if 0 <= x1 <= 10:
             break
-        print("Enter a number between 0 and 10")
+        else:
+            print("Enter a number between 0 and 10")
     except ValueError:
         print("Enter a valid number")
 
 y=get_random_number()
-print("bot enter number is " ,y)
+print("Bot entered number is " ,y)
+time.sleep(3)
 z=x1+y
 if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
+    time.sleep(3)
     print ("the number is ",z ,"u won the toss")
     while True:
         a = input("batting or bowling: ").lower()
@@ -115,6 +151,7 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
         else:
          print("Enter batting or bowling only")
     if a=="batting":
+        time.sleep(3)
         print("u chose batting and bot is bowling")
         print("=" * 60)
         print("\n")
@@ -131,23 +168,40 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x==y:
+                    time.sleep(3)
                     print ("out")
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    time.sleep(3)
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-1      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
                     break
                 else:
                     player_score +=x
                     number_of_balls += 1
                     player_score_total +=x
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
             else:
                 print("out of range")
                 print(f"penalty of -5 points for out of range input")
                 player_score_total= max(0, player_score-5)
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
+
         print("=" * 60)
         print("now bot is battting and u are bowling")
         print("=" * 60)
@@ -159,12 +213,17 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x == y:
+                    time.sleep(3)
                     print("OUT")
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print("|                                                                            |")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-1      |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     if bot_score_total > player_score_total:
                         print("Bot won by", bot_score_total - player_score_total)
@@ -181,8 +240,12 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                     bot_score += y
                     number_of_balls_bot += 1
                     bot_score_total += y
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                 if bot_score_total > player_score_total:
                     print("Bot won by", bot_score_total - player_score_total)
@@ -190,8 +253,15 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
 
             else:
                 print("out of range")
+                time.sleep(3)
                 print(f"penalty of +5 runs to bot score for out of range input")
                 bot_score_total = bot_score + 5
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")  
 
     elif a== "bowling":
         print("=" * 60)
@@ -210,24 +280,41 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x==y:
                     print ("out")
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    time.sleep(3)
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-1         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     break
                 else:
                     bot_score += y
                     number_of_balls_bot += 1
                     bot_score_total += y
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
             else:
                 print("out of range")
+                time.sleep(3)
                 print(f"penalty of +5 runs to bot score for out of range input")
                 bot_score_total = bot_score + 5
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                print("|                                                                            |") 
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
+
         print("=" * 60)
         print("now bot is bowling and u are batting")
         print("=" * 60)
@@ -239,12 +326,16 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x == y:
                     print("OUT")
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-1      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     if player_score_total > bot_score_total:
                         print("You won by", player_score_total - bot_score_total)
@@ -261,16 +352,27 @@ if (z %2 ==0 and x=="even") or (z%2 ==1 and x=="odd"):
                     player_score += x
                     number_of_balls += 1
                     player_score_total += x
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                 if player_score_total > bot_score_total:
                     print("You won by", player_score_total - bot_score_total)
                     break
             else:
                 print("out of range")
+                time.sleep(3)
                 print(f"penalty of -5 points for out of range input")
                 player_score_total = max(0, player_score-5)
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
 
 else :
     print("=" * 60)
@@ -281,6 +383,7 @@ else :
     if a=="batting":
         print("now bot is batting and u are bowling")
         print("-" * 60)
+        time.sleep(3)
         bot_score=0
         number_of_balls_bot=0
         player_score=0
@@ -294,12 +397,17 @@ else :
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x==y:
                     print ("out")
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    time.sleep(3)
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-1         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     break
                 else:
@@ -307,12 +415,23 @@ else :
                     bot_score_total += y
                     number_of_balls_bot += 1
 
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
             else:
                 print("out of range")
+                time.sleep(3)
                 print(f"penalty of +5 runs to bot score for out of range input")
                 bot_score_total = bot_score + 5
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
 
         print("=" * 60)
         print("now bot is bowling and u are batting")
@@ -325,12 +444,17 @@ else :
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x == y:
                     print("OUT")
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    time.sleep(3)
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-1      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     if player_score_total > bot_score_total:
                         print("You won by", player_score_total - bot_score_total)
@@ -347,18 +471,32 @@ else :
                     player_score += x
                     number_of_balls += 1
                     player_score_total += x
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                 if player_score_total > bot_score_total:
                     print("You won by", player_score_total - bot_score_total)
+                    result = "You won"
                     break
             else:
                 print("out of range")
                 print(f"penalty of -5 points for out of range input")
                 player_score_total = max(0, player_score-5)
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
+
     elif a== "bowling":
         print("bot chose bowling and you are batting")
+        print("-" * 60)
+        time.sleep(3)
         player_score=0
         number_of_balls=0
         bot_score=0
@@ -372,25 +510,39 @@ else :
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x==y:
                     print ("out")
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-1      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     break
                 else:
                     player_score += x
                     number_of_balls += 1
                     player_score_total += x
-                    print(f"{user}   {player_score} ({number_of_balls})    {player_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
             else:
                 print("out of range")
                 print(f"penalty of -5 points for out of range input")
                 player_score_total = max(0, player_score-5)
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {player_score_total}-0      |")
+                print("|                                                                            |") 
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
 
         print("=" * 60)
         print("now bot is batting and you are bowling")
@@ -403,12 +555,16 @@ else :
                 print("Enter a valid number")
                 continue
             y=get_random_number()
-            print(y)
+            print(f"Bot entered number is {y}")
             if 0<=x<=10:
                 if x == y:
                     print("OUT")
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-1")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-1         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                     if bot_score_total > player_score_total:
                         print("Bot won by", bot_score_total - player_score_total)
@@ -425,16 +581,27 @@ else :
                     bot_score += y
                     bot_score_total += y
                     number_of_balls_bot += 1
-                    print(f"{user}   {player_score} ({number_of_balls})    {bot_score_total}-0")
-                    print(f"bot   {bot_score} ({number_of_balls_bot})")
+                    print("=============================================================================")
+                    print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                    print("|                                                                            |")
+                    print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                    print("|                                                                            |")
+                    print("=============================================================================")
 
                 if bot_score_total > player_score_total:
                     print("Bot won by", bot_score_total - player_score_total)
+                    result = "Bot won"
                     break
             else:
                 print("out of range")
                 print(f"penalty of +5 runs to bot score for out of range input")
                 bot_score_total = bot_score + 5
+                print("=============================================================================")
+                print(f"|{user}   {player_score} ({number_of_balls})    {bot_score_total}-0         |")
+                print("|                                                                            |")
+                print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |")
+                print("|                                                                            |")
+                print("=============================================================================")
 
 cursor.execute("""
 UPDATE users
