@@ -173,27 +173,39 @@ while True:
                         time.sleep(3)
                         print ("out")
                         time.sleep(3)
-                        print("=============================================================================")
+                        print("=" * 77)
                         print("              PLAYER LIST                     |              RUNS            |")
-                        print("______________________________________________________________________________")
-                        print(f"|{user}   {player_score} ({number_of_balls})                              |              {player_score_total}-1             |")
-                        print("|                                             |                              |")
-                        print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |                              |")
-                        print("|                                             |                              |")
-                        print("=============================================================================")
+                        print("_" * 77)
+
+                        left = f"{user}   {player_score} ({number_of_balls})"
+                        print(f"|{left:<45}|{player_score_total}-1")
+
+                        print("|" + " " * 45 + "|" + " " * 30 + "|")
+
+                        left = f"bot   {bot_score} ({number_of_balls_bot})"
+                        print(f"|{left:<45}|")
+
+                        print("|" + " " * 45 + "|" + " " * 30 + "|")
+                        print("=" * 77)
                         break
                     else:
                         player_score +=x
                         number_of_balls += 1
                         player_score_total +=x
-                        print("=============================================================================")
+                        print("=" * 77)
                         print("              PLAYER LIST                     |              RUNS            |")
-                        print("______________________________________________________________________________")
-                        print(f"|{user}   {player_score} ({number_of_balls})                              |              {player_score_total}-0             |")
-                        print("|                                             |                              |")
-                        print(f"|bot   {bot_score} ({number_of_balls_bot})                                  |                              |")
-                        print("|                                             |                              |")
-                        print("=============================================================================")
+                        print("_" * 77)
+
+                        left = f"{user}   {player_score} ({number_of_balls})"
+                        print(f"|{left:<45}|{player_score_total}-0")
+
+                        print("|" + " " * 45 + "|" + " " * 30 + "|")
+
+                        left = f"bot   {bot_score} ({number_of_balls_bot})"
+                        print(f"|{left:<45}|")
+
+                        print("|" + " " * 45 + "|" + " " * 30 + "|")
+                        print("=" * 77)
                 else:
                     print("out of range")
                     print(f"penalty of -5 points for out of range input")
@@ -258,6 +270,7 @@ while True:
 
                     if bot_score_total > player_score_total:
                         print("Bot won by", bot_score_total - player_score_total)
+                        result = "Bot won"
                         break
 
                 else:
@@ -382,6 +395,7 @@ while True:
 
                     if player_score_total > bot_score_total:
                         print("You won by", player_score_total - bot_score_total)
+                        result=("You won")
                         break
                 else:
                     print("out of range")
@@ -709,6 +723,20 @@ while True:
         print("\n===== TOP 5 PLAYERS =====")
         for row in cursor.fetchall():
             print(f"{row[0]:10} Wins: {row[1]:2}  Highest: {row[2]}")
+    
+    leaderboard_choice =input("\nDo you want to see the highest score leaderboard? (yes/no): ").lower()
+    if leaderboard_choice == "yes":
+        cursor.execute("""
+        SELECT username, highest_score
+        FROM users
+        ORDER BY highest_score DESC
+        LIMIT 5
+        """)
+    
+
+        print("\n===== HIGHEST SCORE LEADERBOARD =====")
+        for row in cursor.fetchall():
+            print(f"{row[0]:10} Highest Score: {row[1]}")
     
     while True:
         play_again = input("\nDo you want to play again? (yes/no): ").strip().lower()
